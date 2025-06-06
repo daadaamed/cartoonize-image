@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Cartoonify Your Image</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        text-align: center;
+        background: #f5f5f5;
+      }
+      h1 {
+        margin-top: 50px;
+      }
+      .container {
+        margin-top: 30px;
+        padding: 20px;
+        background: white;
+        display: inline-block;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+      input[type="file"] {
+        display: none;
+      }
+      label {
+        background: #3498db;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+      img {
+        max-width: 400px;
+        margin-top: 20px;
+        border-radius: 10px;
+      }
+      .output-img {
+        margin-top: 30px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Cartoonify Your Image</h1>
+    <div class="container">
+      <form id="upload-form" enctype="multipart/form-data">
+        <label for="file">Choose Image</label>
+        <input type="file" id="file" name="file" accept="image/*" />
+        <div class="output-img" id="preview-container"></div>
+        <div class="output-img" id="result-container"></div>
+      </form>
+    </div>
+
+    <script>
+      const form = document.getElementById("upload-form");
+      const fileInput = document.getElementById("file");
+      const previewContainer = document.getElementById("preview-container");
+      const resultContainer = document.getElementById("result-container");
+
+      fileInput.addEventListener("change", () => {
+        const file = fileInput.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            previewContainer.innerHTML = `<img src="${e.target.result}" alt="Preview">`;
+          };
+          reader.readAsDataURL(file);
+        }
+
+        const formData = new FormData();
+        formData.append("file", file);
+
+        fetch("/", { method: "POST", body: formData })
+          .then((res) => res.blob())
+          .then((blob) => {
+            const url = URL.createObjectURL(blob);
+            resultContainer.innerHTML = `<h3>Cartoonified Image:</h3><img src="${url}" alt="Cartoonified">`;
+          });
+      });
+    </script>
+  </body>
+</html>
